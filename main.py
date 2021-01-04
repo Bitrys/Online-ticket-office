@@ -115,7 +115,7 @@ class Main(QWidget):
         doc.add_heading('Дата вылета:', level=1)
         doc.add_paragraph(time)
 
-        ean = barcode.get('ean13', str(id_ticket), writer=ImageWriter())  # created barcode
+        ean = barcode.codex.Code39(str(id_ticket), writer=ImageWriter(), add_checksum=False)
         filename = ean.save('data/flight_barcode')  # save barcode
         doc.add_picture('data/flight_barcode.png', width=Inches(5))
 
