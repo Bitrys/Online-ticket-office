@@ -50,8 +50,6 @@ class Main(QWidget):
             self.status.setStyleSheet('background: red;')
             self.status.setText('Refusal to purchase!')
         else:
-            self.id_ticket = random.randint(487763, 37638763455)
-
             self.status.setStyleSheet('background: green;')
             self.status.setText('Ok!')
 
@@ -81,7 +79,7 @@ class Main(QWidget):
         }
 
         if promocode in discount:
-            self.total_sum_output.setText(f'{str(discount[promocode](price))} ₽')
+            self.total_sum_output.setText(f'{discount[promocode](price)} ₽')
         else:
             self.total_sum_output.setText(f'{price} ₽')
 
