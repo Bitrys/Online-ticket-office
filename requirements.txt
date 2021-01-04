@@ -2,3 +2,5 @@ python_docx==0.8.10
 barcode_generator==0.1rc15
 docx==0.2.4
 PyQt5==5.15.2
+
+barcode~=1.0.1

@@ -8,12 +8,12 @@ import sqlite3
 import sys
 import random
 
+import barcode
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5 import uic
 from docx import Document
 from docx.shared import Inches
-from barcode import EAN13
 from barcode.writer import ImageWriter
 
 
@@ -32,7 +32,6 @@ class Main(QWidget):
         self.bought.clicked.connect(self.start_bought_process)
         self.choise_class.lineEdit().setDisabled(True)
 
-
     def start_bought_process(self):
         """
         Check and progress user input and buy a ticket.
@@ -40,7 +39,7 @@ class Main(QWidget):
 
         self.total_sum_output.setText('')
 
-        id_ticket = random.randint(487763, 37638763455)
+        id_ticket = random.randint(123456789012, 9999999999999)
         class_flight = self.choise_class.currentText()
         address_from, address_to, time = self.froms.text(), self.to.text(), self.when.text()
         fio, passport_data = self.fio.text(), self.passport.text()
@@ -94,9 +93,6 @@ class Main(QWidget):
         :param address_to: arrival airport
         """
 
-        with open('data/code.jpeg', 'wb') as f:
-            EAN13('100000011111', writer=ImageWriter()).write(f)
-
         doc = Document()
         doc.add_picture('data/zmih_logo.png', width=Inches(1.25))
         doc.add_heading('Жмых эйр: билет № ' + str(random.randint(10, 999999)), 0)
@@ -119,7 +115,9 @@ class Main(QWidget):
         doc.add_heading('Дата вылета:', level=1)
         doc.add_paragraph(time)
 
-        doc.add_picture('data/code.jpeg', width=Inches(5))
+        ean = barcode.get('ean13', str(id_ticket), writer=ImageWriter())  # created barcode
+        filename = ean.save('data/flight_barcode')  # save barcode
+        doc.add_picture('data/flight_barcode.png', width=Inches(5))
 
         doc.save('ticket.docx')
 
