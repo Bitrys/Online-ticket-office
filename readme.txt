@@ -9,6 +9,7 @@ pip install barcode[image]
 pip install PyQT5
 pip install python-docx
 pip install misaka (for stable work)
+pip install cython (code optimistaion)
 
 Special req:
 Visual C++ 14+ version (for barcode)
