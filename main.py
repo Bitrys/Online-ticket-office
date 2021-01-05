@@ -41,7 +41,7 @@ class Main(QWidget):
         self.choise_class.lineEdit().setDisabled(True)
 
         wave_obj = sa.WaveObject.from_wave_file('data/theme_app.wav')
-        play_obj = wave_obj.play()
+        wave_obj.play()
 
     def start_bought_process(self):
         """
