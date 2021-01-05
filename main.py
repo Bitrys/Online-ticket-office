@@ -72,7 +72,6 @@ class Main(QWidget):
                     self.status.setText('Fatal error code: E004!')
                     print(str(e))
                     print('Please, report this error, as well as the latest actions, to the system administrator!')
-                    except_hook()
 
     def count_sum_bought(self, class_flight, promocode):
         """
