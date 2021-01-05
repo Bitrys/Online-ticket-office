@@ -124,7 +124,7 @@ class Main(QWidget):
 
         try:
             doc = Document()
-            doc.add_picture('data/zmih_logo.png', width=Inches(1.25))
+            doc.add_picture('data/zmih_logo.png', width=Inches(4))
             doc.add_heading(f'Жмых эйр: билет № {random.randint(10, 999999)}', 0)
 
             doc.add_heading('Пассажир:', level=1)
@@ -147,7 +147,7 @@ class Main(QWidget):
 
             ean = barcode.codex.Code39(str(id_ticket), writer=ImageWriter(), add_checksum=False)  # created barcode
             ean.save(f'data/{id_ticket}')  # save barcode
-            doc.add_picture(f'data/{id_ticket}.png', width=Inches(5))
+            doc.add_picture(f'data/{id_ticket}.png', width=Inches(2))
 
             doc.save('ticket.docx')
         except Exception as e:
