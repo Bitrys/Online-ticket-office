@@ -23,6 +23,8 @@
 - [Gusarich](https://github.com/Gusarich)
 - [hokahu](https://github.com/hokahu)
 - [Sholastik](https://github.com/Sholastik)
+- [BUYT-1](https://github.com/BUYT-1)
+- [poctik404](https://vk.com/poctik404)
 
 Если вы хотите также стать спонсором, пишите мне в ЛС (@redandwhiteu -VK -t.me) и я вас занесу сюда. 
 Интерес к проекту — уже спонсорство!
