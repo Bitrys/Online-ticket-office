@@ -16,6 +16,7 @@ import random
 
 import barcode
 import cython
+import simpleaudio as sa
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5 import uic
@@ -35,9 +36,12 @@ class Main(QWidget):
 
         self.choise_class.setEditable(True)
         self.choise_class.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
-        self.choise_class.lineEdit().setFont(QtGui.QFont("Roboto Slab", 14))
+        self.choise_class.lineEdit().setFont(QtGui.QFont('Roboto Slab', 14))
         self.bought.clicked.connect(self.start_bought_process)
         self.choise_class.lineEdit().setDisabled(True)
+
+        wave_obj = sa.WaveObject.from_wave_file('data/theme_app.wav')
+        play_obj = wave_obj.play()
 
     def start_bought_process(self):
         """
