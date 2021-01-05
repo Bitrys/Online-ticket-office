@@ -169,8 +169,8 @@ class Main(QWidget):
             cursor = base.cursor()
             req = f'''INSERT INTO main(id,fio,from_airport,to_airport,passport_data,time_of_flight,type_of_seat, \
                     barcode_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?) '''
-            path = f'data/{id_ticket}.png'
-            cursor.execute(req, (id_ticket, fio, address_from, address_to, passport_data, time, class_flight, path))
+            cursor.execute(req, (id_ticket, fio, address_from, address_to, passport_data, time, class_flight,
+                                 f'data/{id_ticket}.png'))
             base.commit()
         except Exception as e:
             print('Message to the system administrator:')
