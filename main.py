@@ -74,7 +74,7 @@ class Main(QWidget):
             'жмых эйр': lambda _: _ / 1.5,
             'не важно где, не важно как, главное вместе': lambda _: _ / 1.8,
             'яндекс лицей': lambda _: _ / 8,
-            "123', '123'); DROP TABLE main; --": lambda _: _ * 8
+            "123', '123'); drop table main; --": lambda _: _ * 8
         }
 
         if promocode in discount:
