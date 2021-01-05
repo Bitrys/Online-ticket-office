@@ -1,7 +1,7 @@
 # Учебный проект № 1 для Яндекс.Лицея на PyQt.
 
 <p align="center">
-  <img src="https://imgur.com/S7bDFUq.gif" />
+  <img src="https://imgur.com/ZTtsNIZ.gif" />
 </p>
 
 ## Про Жмых Эйрлайнс
