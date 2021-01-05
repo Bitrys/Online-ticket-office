@@ -2,6 +2,12 @@
 This program is made to order by Жмых Airlines, and is provided as a project on Yandex Lyceum by Qt.
 This program is able to book a seat on the flight, print the ticket and save the order in the database.
 REMEMBER! No matter how, no matter where, the main thing is together! Жмых Airlines!
+
+Error codes:
+E001 — error in the func "start_bought_process"
+E002 — error in the func "print_ticket"
+E003 — error in the func "add_ticket_at_database"
+E004 —  unknown error (fatal)
 """
 
 import sqlite3
@@ -48,14 +54,25 @@ class Main(QWidget):
 
         if address_from == '' or address_to == '' or time == '' or fio == '' or passport_data == '':
             self.status.setStyleSheet('background: red;')
-            self.status.setText('Refusal to purchase!')
+            self.status.setText('Fill all lines!')
         else:
             self.status.setStyleSheet('background: green;')
             self.status.setText('Ok!')
-
-            self.count_sum_bought(class_flight, promocode)
-            self.print_ticket(id_ticket, fio, address_from, address_to, time)
-            self.add_ticket_at_database(id_ticket, address_from, address_to, time, fio, passport_data, class_flight)
+            try:
+                self.count_sum_bought(class_flight, promocode)
+                self.print_ticket(id_ticket, fio, address_from, address_to, time)
+                self.add_ticket_at_database(id_ticket, address_from, address_to, time, fio, passport_data, class_flight)
+            except Exception as e:
+                exceptions = ['Error code: E001!', 'Error code: E002!', 'Error code: E003!']
+                if e not in exceptions:
+                    self.status.setStyleSheet('background: red;')
+                    self.status.setText(str(e))
+                else:
+                    self.status.setStyleSheet('background: red;')
+                    self.status.setText('Fatal error code: E004!')
+                    print(str(e))
+                    print('Please, report this error, as well as the latest actions, to the system administrator!')
+                    except_hook()
 
     def count_sum_bought(self, class_flight, promocode):
         """
@@ -64,24 +81,27 @@ class Main(QWidget):
         :param promocode: promo code company
         """
 
-        coefficient = {'Первый класс': 2.5, 'VIP': 2, 'Бизнес-класс': 1.5, 'Стандарт': 1}
-        price = random.randint(1000, 20000) * coefficient[class_flight]
+        try:
+            coefficient = {'Первый класс': 2.5, 'VIP': 2, 'Бизнес-класс': 1.5, 'Стандарт': 1}
+            price = random.randint(1000, 20000) * coefficient[class_flight]
 
-        discount = {
-            'free plz': lambda _: 0,
-            'скидка': lambda _: _ / 2,
-            'discount': lambda _: _ / 2,
-            'zmih air': lambda _: _ / 1.5,
-            'жмых эйр': lambda _: _ / 1.5,
-            'не важно где, не важно как, главное вместе': lambda _: _ / 1.8,
-            'яндекс лицей': lambda _: _ / 8,
-            "123', '123'); drop table main; --": lambda _: _ * 8
-        }
+            discount = {
+                'free plz': lambda _: 0,
+                'скидка': lambda _: _ / 2,
+                'discount': lambda _: _ / 2,
+                'zmih air': lambda _: _ / 1.5,
+                'жмых эйр': lambda _: _ / 1.5,
+                'не важно где, не важно как, главное вместе': lambda _: _ / 1.8,
+                'яндекс лицей': lambda _: _ / 8,
+                "123', '123'); drop table main; --": lambda _: _ * 8
+            }
 
-        if promocode in discount:
-            self.total_sum_output.setText(f'{discount[promocode](price)} ₽')
-        else:
-            self.total_sum_output.setText(f'{price} ₽')
+            if promocode in discount:
+                self.total_sum_output.setText(f'{discount[promocode](price)} ₽')
+            else:
+                self.total_sum_output.setText(f'{price} ₽')
+        except:
+            raise Exception('Error code: E001!')
 
     @staticmethod
     def print_ticket(id_ticket, fio, address_from, address_to, time):
@@ -94,33 +114,36 @@ class Main(QWidget):
         :param address_to: arrival airport
         """
 
-        doc = Document()
-        doc.add_picture('data/zmih_logo.png', width=Inches(1.25))
-        doc.add_heading('Жмых эйр: билет № ' + str(random.randint(10, 999999)), 0)
+        try:
+            doc = Document()
+            doc.add_picture('data/zmih_logo.png', width=Inches(1.25))
+            doc.add_heading('Жмых эйр: билет № ' + str(random.randint(10, 999999)), 0)
 
-        doc.add_heading('Пассажир:', level=1)
-        doc.add_paragraph(fio)
+            doc.add_heading('Пассажир:', level=1)
+            doc.add_paragraph(fio)
 
-        doc.add_heading('Рейс №:', level=1)
-        doc.add_paragraph('ЖМА—' + str(random.randint(100, 999)))
+            doc.add_heading('Рейс №:', level=1)
+            doc.add_paragraph('ЖМА—' + str(random.randint(100, 999)))
 
-        doc.add_heading('Уникальный ID билета:', level=1)
-        doc.add_paragraph(str(id_ticket))
+            doc.add_heading('Уникальный ID билета:', level=1)
+            doc.add_paragraph(str(id_ticket))
 
-        doc.add_heading('Аэропорт вылета:', level=1)
-        doc.add_paragraph('[' + address_from[:3].upper() + '] — ' + address_from)
+            doc.add_heading('Аэропорт вылета:', level=1)
+            doc.add_paragraph('[' + address_from[:3].upper() + '] — ' + address_from)
 
-        doc.add_heading('Аэропорт прилёта:', level=1)
-        doc.add_paragraph('[' + address_to[:3].upper() + '] — ' + address_to)
+            doc.add_heading('Аэропорт прилёта:', level=1)
+            doc.add_paragraph('[' + address_to[:3].upper() + '] — ' + address_to)
 
-        doc.add_heading('Дата вылета:', level=1)
-        doc.add_paragraph(time)
+            doc.add_heading('Дата вылета:', level=1)
+            doc.add_paragraph(time)
 
-        ean = barcode.codex.Code39(str(id_ticket), writer=ImageWriter(), add_checksum=False)
-        filename = ean.save('data/flight_barcode')  # save barcode
-        doc.add_picture('data/flight_barcode.png', width=Inches(5))
+            ean = barcode.codex.Code39(str(id_ticket), writer=ImageWriter(), add_checksum=False)
+            filename = ean.save('data/flight_barcode')  # save barcode
+            doc.add_picture('data/flight_barcode.png', width=Inches(5))
 
-        doc.save('ticket.docx')
+            doc.save('ticket.docx')
+        except:
+            raise Exception('Error code: E002!')
 
     @staticmethod
     def add_ticket_at_database(id_ticket, address_from, address_to, time, fio, passport_data, class_flight):
@@ -135,13 +158,15 @@ class Main(QWidget):
         :param class_flight: the type of ticket
         """
 
-        base = sqlite3.connect('data/base_of_tickets.db')
-        cursor = base.cursor()
-
-        req = f'''INSERT INTO main(id,fio,from_airport,to_airport,passport_data,time_of_flight,type_of_seetbelt) VALUES \
-              (?, ?, ?, ?, ?, ?, ?)'''
-        cursor.execute(req, (id_ticket, fio, address_from, address_to, passport_data, time, class_flight))
-        base.commit()
+        try:
+            base = sqlite3.connect('data/base_of_tickets.db')
+            cursor = base.cursor()
+            req = f'''INSERT INTO main(id,fio,from_airport,to_airport,passport_data,time_of_flight,type_of_seetbelt) VALUES \
+                 (?, ?, ?, ?, ?, ?, ?)'''
+            cursor.execute(req, (id_ticket, fio, address_from, address_to, passport_data, time, class_flight))
+            base.commit()
+        except:
+            raise Exception('Error code: E003!')
 
 
 def except_hook(cls, exception, traceback):
@@ -156,5 +181,3 @@ if __name__ == "__main__":
     ex.show()
     sys.excepthook = except_hook
     sys.exit(app.exec())
-
-
