@@ -142,8 +142,8 @@ class Main(QWidget):
             doc.add_paragraph(time)
 
             ean = barcode.codex.Code39(str(id_ticket), writer=ImageWriter(), add_checksum=False)  # created barcode
-            ean.save('data/flight_barcode')  # save barcode
-            doc.add_picture('data/flight_barcode.png', width=Inches(5))
+            ean.save(f'data/{id_ticket}')  # save barcode
+            doc.add_picture(f'data/{id_ticket}.png', width=Inches(5))
 
             doc.save('ticket.docx')
         except Exception as e:
@@ -167,9 +167,10 @@ class Main(QWidget):
         try:
             base = sqlite3.connect('data/base_of_tickets.db')
             cursor = base.cursor()
-            req = f'''INSERT INTO main(id,fio,from_airport,to_airport,passport_data,time_of_flight,type_of_seat) \
-                    VALUES (?, ?, ?, ?, ?, ?, ?)'''
-            cursor.execute(req, (id_ticket, fio, address_from, address_to, passport_data, time, class_flight))
+            req = f'''INSERT INTO main(id,fio,from_airport,to_airport,passport_data,time_of_flight,type_of_seat, \
+                    barcode_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?) '''
+            path = f'data/{id_ticket}.png'
+            cursor.execute(req, (id_ticket, fio, address_from, address_to, passport_data, time, class_flight, path))
             base.commit()
         except Exception as e:
             print('Message to the system administrator:')
