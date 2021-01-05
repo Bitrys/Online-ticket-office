@@ -103,6 +103,7 @@ class Main(QWidget):
             else:
                 self.total_sum_output.setText(f'{price} ₽')
         except Exception as e:
+            print('Message to the system administrator:')
             print(e)
             raise Exception('Error code: E001!')
 
@@ -140,12 +141,13 @@ class Main(QWidget):
             doc.add_heading('Дата вылета:', level=1)
             doc.add_paragraph(time)
 
-            ean = barcode.codex.Code39(str(id_ticket), writer=ImageWriter(), add_checksum=False)
+            ean = barcode.codex.Code39(str(id_ticket), writer=ImageWriter(), add_checksum=False)  # created barcode
             ean.save('data/flight_barcode')  # save barcode
             doc.add_picture('data/flight_barcode.png', width=Inches(5))
 
             doc.save('ticket.docx')
         except Exception as e:
+            print('Message to the system administrator:')
             print(e)
             raise Exception('Error code: E002!')
 
@@ -170,6 +172,7 @@ class Main(QWidget):
             cursor.execute(req, (id_ticket, fio, address_from, address_to, passport_data, time, class_flight))
             base.commit()
         except Exception as e:
+            print('Message to the system administrator:')
             print(e)
             raise Exception('Error code: E003!')
 
