@@ -141,7 +141,7 @@ class Main(QWidget):
             doc.add_paragraph(time)
 
             ean = barcode.codex.Code39(str(id_ticket), writer=ImageWriter(), add_checksum=False)
-            filename = ean.save('data/flight_barcode')  # save barcode
+            ean.save('data/flight_barcode')  # save barcode
             doc.add_picture('data/flight_barcode.png', width=Inches(5))
 
             doc.save('ticket.docx')
