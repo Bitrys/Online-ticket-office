@@ -116,22 +116,22 @@ class Main(QWidget):
         try:
             doc = Document()
             doc.add_picture('data/zmih_logo.png', width=Inches(1.25))
-            doc.add_heading('Жмых эйр: билет № ' + str(random.randint(10, 999999)), 0)
+            doc.add_heading(f'Жмых эйр: билет № {random.randint(10, 999999)}', 0)
 
             doc.add_heading('Пассажир:', level=1)
             doc.add_paragraph(fio)
 
             doc.add_heading('Рейс №:', level=1)
-            doc.add_paragraph('ЖМА—' + str(random.randint(100, 999)))
+            doc.add_paragraph(f'ЖМА — {random.randint(100, 999)}')
 
             doc.add_heading('Уникальный ID билета:', level=1)
             doc.add_paragraph(str(id_ticket))
 
             doc.add_heading('Аэропорт вылета:', level=1)
-            doc.add_paragraph('[' + address_from[:3].upper() + '] — ' + address_from)
+            doc.add_paragraph(f'[{address_from[:3].upper()}] — {address_from}')
 
             doc.add_heading('Аэропорт прилёта:', level=1)
-            doc.add_paragraph('[' + address_to[:3].upper() + '] — ' + address_to)
+            doc.add_paragraph(f'[{address_to[:3].upper()}] — {+ address_to}')
 
             doc.add_heading('Дата вылета:', level=1)
             doc.add_paragraph(time)
