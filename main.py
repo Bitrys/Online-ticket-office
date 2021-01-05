@@ -102,7 +102,8 @@ class Main(QWidget):
                 self.total_sum_output.setText(f'{discount[promocode](price)} ₽')
             else:
                 self.total_sum_output.setText(f'{price} ₽')
-        except:
+        except Exception as e:
+            print(e)
             raise Exception('Error code: E001!')
 
     @staticmethod
@@ -144,7 +145,8 @@ class Main(QWidget):
             doc.add_picture('data/flight_barcode.png', width=Inches(5))
 
             doc.save('ticket.docx')
-        except:
+        except Exception as e:
+            print(e)
             raise Exception('Error code: E002!')
 
     @staticmethod
@@ -163,11 +165,12 @@ class Main(QWidget):
         try:
             base = sqlite3.connect('data/base_of_tickets.db')
             cursor = base.cursor()
-            req = f'''INSERT INTO main(id,fio,from_airport,to_airport,passport_data,time_of_flight,type_of_seetbelt) VALUES \
-                 (?, ?, ?, ?, ?, ?, ?)'''
+            req = f'''INSERT INTO main(id,fio,from_airport,to_airport,passport_data,time_of_flight,type_of_seat) \
+                    VALUES (?, ?, ?, ?, ?, ?, ?)'''
             cursor.execute(req, (id_ticket, fio, address_from, address_to, passport_data, time, class_flight))
             base.commit()
-        except:
+        except Exception as e:
+            print(e)
             raise Exception('Error code: E003!')
 
 
