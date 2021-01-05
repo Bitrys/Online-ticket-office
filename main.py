@@ -55,6 +55,7 @@ class Main(QWidget):
         if address_from == '' or address_to == '' or time == '' or fio == '' or passport_data == '':
             self.status.setStyleSheet('background: red;')
             self.status.setText('Fill all lines!')
+            self.total_sum_output.setText('')
         else:
             self.status.setStyleSheet('background: green;')
             self.status.setText('Ok!')
@@ -67,9 +68,11 @@ class Main(QWidget):
                 if e not in exceptions:
                     self.status.setStyleSheet('background: red;')
                     self.status.setText(str(e))
+                    self.total_sum_output.setText('')
                 else:
                     self.status.setStyleSheet('background: red;')
                     self.status.setText('Fatal error code: E004!')
+                    self.total_sum_output.setText('')
                     print(str(e))
                     print('Please, report this error, as well as the latest actions, to the system administrator!')
 
@@ -131,7 +134,7 @@ class Main(QWidget):
             doc.add_paragraph(f'[{address_from[:3].upper()}] — {address_from}')
 
             doc.add_heading('Аэропорт прилёта:', level=1)
-            doc.add_paragraph(f'[{address_to[:3].upper()}] — {+ address_to}')
+            doc.add_paragraph(f'[{address_to[:3].upper()}] — {address_to}')
 
             doc.add_heading('Дата вылета:', level=1)
             doc.add_paragraph(time)
