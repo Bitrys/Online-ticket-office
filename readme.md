@@ -41,6 +41,7 @@ pip install PyQT5
 pip install python-docx
 pip install misaka
 pip install cython
+pip install simpleaudio
 ```
 
 Также вам может понадобиться C Visual Studio 14+ version.
