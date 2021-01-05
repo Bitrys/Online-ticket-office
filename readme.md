@@ -31,6 +31,8 @@
 
 ## Установка
 
+### Не скомпилированная версия:
+
 Для установки приложения, вам необходим Python 3.9 v, а также прописать в командную строку следующие команды:
 
 ```
@@ -38,9 +40,14 @@ pip install barcode[image]
 pip install PyQT5
 pip install python-docx
 pip install misaka
+pip install cython
 ```
 
 Также вам может понадобиться C Visual Studio 14+ version.
+
+### Скомпилированная версия:
+
+[Скачать](https://www.upload.ee/download/12725414/03af79f2d681187ad9a6/project.rar) и запустить.
 
 ## Запуск
 
