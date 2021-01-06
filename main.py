@@ -68,8 +68,7 @@ class Main(QWidget):
                 self.print_ticket(id_ticket, fio, address_from, address_to, time)
                 self.add_ticket_at_database(id_ticket, address_from, address_to, time, fio, passport_data, class_flight)
             except Exception as e:
-                exceptions = ['Error code: E001!', 'Error code: E002!', 'Error code: E003!']
-                if e not in exceptions:
+                if str(e) == 'Error code: E001!' or str(e) == 'Error code: E002!' or str(e) == 'Error code: E003!':
                     self.status.setStyleSheet('background: red;')
                     self.status.setText(str(e))
                     self.total_sum_output.setText('')
