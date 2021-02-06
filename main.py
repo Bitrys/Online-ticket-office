@@ -1,164 +1,184 @@
 """
-This application is a training work on WEB-7 " WEB. Знакомство с API" and pretends that this is a fucking cool map (no).
+This program is made to order by Жмых Airlines, and is provided as a project on Yandex Lyceum by Qt.
+This program is able to book a seat on the flight, print the ticket and save the order in the database.
+REMEMBER! No matter how, no matter where, the main thing is together! Жмых Airlines!
+
+Error codes:
+E001 — error in the func "start_bought_process"
+E002 — error in the func "print_ticket"
+E003 — error in the func "add_ticket_at_database"
+E004 —  unknown error (fatal)
 """
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap
-from PyQt5 import QtCore
-from PyQt5 import uic
-
+import sqlite3
 import sys
-import requests
+import random
+
+import barcode
+import cython
+import simpleaudio as sa
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5 import uic
+from docx import Document
+from docx.shared import Inches
+from barcode.writer import ImageWriter
 
 
 class Main(QWidget):
     def __init__(self):
         """
-        Initialized a program.
+        Initialized program.
         """
+
         super(Main, self).__init__()
-        uic.loadUi('map.ui', self)
+        uic.loadUi('mainUI.ui', self)
 
-        # Костыль
-        self.type_of_map.setEditable(True)
-        self.type_of_map.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
-        self.type_of_map.setEditable(False)
+        self.choise_class.setEditable(True)
+        self.choise_class.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
+        self.choise_class.lineEdit().setFont(QtGui.QFont('Roboto Slab', 14))
+        self.bought.clicked.connect(self.start_bought_process)
+        self.choise_class.lineEdit().setDisabled(True)
 
-        # setup map and connect buttons
-        self.set_map()
-        self.findit.clicked.connect(self.set_map)
-        self.resetit.clicked.connect(self.reset_map)
-        self.printresult.clicked.connect(self.print_map)
+        wave_obj = sa.WaveObject.from_wave_file('data/theme_app.wav')
+        wave_obj.play()
 
-    def set_map(self):
+    def start_bought_process(self):
         """
-        Setup map.
-        :return: no returns
+        Check and progress user input and buy a ticket.
         """
-        self.api_req()
 
-        map_photo = QPixmap(self.map_file)
-        map_photo = map_photo.scaled(1100, 790)
-        self.map_line.setPixmap(map_photo)
+        self.total_sum_output.setText('')
 
-        self.get_address()
+        id_ticket = random.randint(123456789012, 9999999999999)
+        class_flight = self.choise_class.currentText()
+        address_from, address_to, time = self.froms.text(), self.to.text(), self.when.text()
+        fio, passport_data = self.fio.text(), self.passport.text()
+        promocode = self.promos.text().lower()
 
-    def reset_map(self):
-        """
-        Returns the map settings to constant values.
-        :return: no returns
-        """
-        file = open('config.cfg')  # open configuration
-        data = file.read()
-        data = data.split('\n')
-        self.latit_inp.setText(data[0])
-        self.longit_inp.setText(data[1])
-        self.spin.setValue(float(data[2]))
-        self.point_to_find.setText('')
-        self.full_address.setText('')
-
-        self.set_map()
-
-    def api_req(self):
-        """
-        Generates an API request from the available input and generates a map to the output.
-        :return: no returns
-        """
-        if self.point_to_find.text() == '':
-            latitude = self.latit_inp.text()
-            longitude = self.longit_inp.text()
-            spn = self.spin.value()
+        if address_from == '' or address_to == '' or time == '' or fio == '' or passport_data == '':
+            self.status.setStyleSheet('background: red;')
+            self.status.setText('Fill all lines!')
+            self.total_sum_output.setText('')
         else:
-            point = self.point_to_find.text()
-            API_request = f'http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={point}&format=json'
-            response = requests.get(API_request)
-
-            if not response:
-                print('Ошибка выполнения запроса:')
-                print(API_request)
-                print('Http статус:', response.status_code, '(', response.reason, ')')
-                sys.exit(1)
-            else:
-                try:
-                    json_response = response.json()
-                    toponym = json_response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
-                    toponym_coodrinates = toponym['Point']['pos']
-                    latitude, longitude = toponym_coodrinates.split(' ')
-                    self.latit_inp.setText(latitude)
-                    self.longit_inp.setText(longitude)
-                    spn = self.spin.value()
-                except:
-                    self.full_address.setText('Адрес не существует')
-
-        types = {
-            'Режим "Карта"': 'map',
-            'Режим "Спутник"': 'sat',
-            'Режим "Гибрид"': 'sat,skl'
-        }
-
-        API_request = f'https://static-maps.yandex.ru/1.x/?ll={latitude},{longitude}&spn={spn},{spn}&l=' \
-                      f'{types[self.type_of_map.currentText()]}&size=650,450&pt={latitude},{longitude},flag'
-        response = requests.get(API_request)
-
-        if not response:
-            print('Ошибка выполнения запроса:')
-            print(API_request)
-            print('Http статус:', response.status_code, '(', response.reason, ')')
-            sys.exit(1)
-        else:
-            self.map_file = 'map.png'
-
-            with open(self.map_file, 'wb') as file:
-                file.write(response.content)
-
-    def get_address(self):
-        if self.point_to_find.text() == '':
-            latitude = self.latit_inp.text()
-            longitude = self.longit_inp.text()
-            API_request = f'http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={latitude},{longitude}&format=json'
-            response = requests.get(API_request)
-        else:
-            point = self.point_to_find.text()
-            API_request = f'http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={point}&format=json'
-            response = requests.get(API_request)
-
-        if not response:
-            print('Ошибка выполнения запроса:')
-            print(API_request)
-            print('Http статус:', response.status_code, '(', response.reason, ')')
-            sys.exit(1)
-        else:
-            json_response = response.json()
-
+            self.status.setStyleSheet('background: green;')
+            self.status.setText('Ok!')
             try:
-                toponym = json_response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
-                toponym_address = toponym['metaDataProperty']['GeocoderMetaData']['text']
-
-                if self.mail_address.isChecked():
-                    try:
-                        post_code = toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]["postal_code"]
-                        self.full_address.setText(f'Полный адрес места: {toponym_address}')
-                        self.post_index_full.setText(f'Почтовый индекс: {post_code}')
-                    except:
-                        self.full_address.setText(f'Полный адрес места: {toponym_address}')
-                        self.post_index_full.setText('Почтовый индекс недоступен в данном регионе, или не существует')
+                self.count_sum_bought(class_flight, promocode)
+                self.print_ticket(id_ticket, fio, address_from, address_to, time)
+                self.add_ticket_at_database(id_ticket, address_from, address_to, time, fio, passport_data, class_flight)
+            except Exception as e:
+                if str(e) == 'Error code: E001!' or str(e) == 'Error code: E002!' or str(e) == 'Error code: E003!':
+                    self.status.setStyleSheet('background: red;')
+                    self.status.setText(str(e))
+                    self.total_sum_output.setText('')
                 else:
-                    self.full_address.setText(f'Полный адрес места: {toponym_address}')
-            except:
-                self.full_address.setText('Error!')
+                    self.status.setStyleSheet('background: red;')
+                    self.status.setText('Fatal error code: E004!')
+                    self.total_sum_output.setText('')
+                    print(str(e))
+                    print('Please, report this error, as well as the latest actions, to the system administrator!')
 
-    def print_map(self):
-        self.api_req()
-        map_photo = QPixmap(self.map_file)
+    def count_sum_bought(self, class_flight, promocode):
+        """
+        Counted sum of bought.
+        :param class_flight: the type of ticket
+        :param promocode: promo code company
+        """
 
+        try:
+            coefficient = {'Первый класс': 2.5, 'VIP': 2, 'Бизнес-класс': 1.5, 'Стандарт': 1}
+            price = random.randint(1000, 20000) * coefficient[class_flight]
 
-    def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_PageUp:
-            spn = self.spin.setValue(self.spin.value() + self.to_step.value())
-            self.set_map()
-        elif event.key() == QtCore.Qt.Key_PageDown:
-            spn = self.spin.setValue(self.spin.value() - self.to_step.value())
-            self.set_map()
+            discount = {
+                'free plz': lambda _: 0,
+                'скидка': lambda _: _ / 2,
+                'discount': lambda _: _ / 2,
+                'zmih air': lambda _: _ / 1.5,
+                'жмых эйр': lambda _: _ / 1.5,
+                'не важно где, не важно как, главное вместе': lambda _: _ / 1.8,
+                'яндекс лицей': lambda _: _ / 8,
+                "123', '123'); drop table main; --": lambda _: _ * 8
+            }
+
+            if promocode in discount:
+                self.total_sum_output.setText(f'{discount[promocode](price)} ₽')
+            else:
+                self.total_sum_output.setText(f'{price} ₽')
+        except Exception as e:
+            print('Message to the system administrator:')
+            print(e)
+            raise Exception('Error code: E001!')
+
+    @staticmethod
+    def print_ticket(id_ticket, fio, address_from, address_to, time):
+        """
+        Printed ticket at ticket.docx
+        :param time: flight date
+        :param id_ticket: unique ticket id
+        :param fio: the initials of the passenger
+        :param address_from: airport of departure
+        :param address_to: arrival airport
+        """
+
+        try:
+            doc = Document()
+            doc.add_picture('data/zmih_logo.png', width=Inches(4))
+            doc.add_heading(f'Жмых эйр: билет № {random.randint(10, 999999)}', 0)
+
+            doc.add_heading('Пассажир:', level=1)
+            doc.add_paragraph(fio)
+
+            doc.add_heading('Рейс №:', level=1)
+            doc.add_paragraph(f'ЖМА — {random.randint(100, 999)}')
+
+            doc.add_heading('Уникальный ID билета:', level=1)
+            doc.add_paragraph(str(id_ticket))
+
+            doc.add_heading('Аэропорт вылета:', level=1)
+            doc.add_paragraph(f'[{address_from[:3].upper()}] — {address_from}')
+
+            doc.add_heading('Аэропорт прилёта:', level=1)
+            doc.add_paragraph(f'[{address_to[:3].upper()}] — {address_to}')
+
+            doc.add_heading('Дата вылета:', level=1)
+            doc.add_paragraph(time)
+
+            ean = barcode.codex.Code39(str(id_ticket), writer=ImageWriter(), add_checksum=False)  # created barcode
+            ean.save(f'data/{id_ticket}')  # save barcode
+            doc.add_picture(f'data/{id_ticket}.png', width=Inches(2))
+
+            doc.save('ticket.docx')
+        except Exception as e:
+            print('Message to the system administrator:')
+            print(e)
+            raise Exception('Error code: E002!')
+
+    @staticmethod
+    def add_ticket_at_database(id_ticket, address_from, address_to, time, fio, passport_data, class_flight):
+        """
+        Added ticket at database.
+        :param id_ticket: unique ticket id
+        :param address_from: airport of departure
+        :param address_to: arrival airport
+        :param time: flight date
+        :param fio: the initials of the passenger
+        :param passport_data: passport and registration data
+        :param class_flight: the type of ticket
+        """
+
+        try:
+            base = sqlite3.connect('data/base_of_tickets.db')
+            cursor = base.cursor()
+            req = f'''INSERT INTO main(id,fio,from_airport,to_airport,passport_data,time_of_flight,type_of_seat, \
+                    barcode_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?) '''
+            cursor.execute(req, (id_ticket, fio, address_from, address_to, passport_data, time, class_flight,
+                                 f'data/{id_ticket}.png'))
+            base.commit()
+        except Exception as e:
+            print('Message to the system administrator:')
+            print(e)
+            raise Exception('Error code: E003!')
 
 
 def except_hook(cls, exception, traceback):
@@ -166,6 +186,8 @@ def except_hook(cls, exception, traceback):
 
 
 if __name__ == "__main__":
+    # sys args of program
+
     app = QApplication(sys.argv)
     ex = Main()
     ex.show()
